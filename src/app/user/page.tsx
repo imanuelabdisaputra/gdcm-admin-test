@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
-import { useToast } from "@/components/ui/use-toast"
+import { useRouter } from "next/navigation";
 
 interface IUser {
   id: string;
@@ -21,7 +21,7 @@ interface IUser {
 }
 
 const User = () => {
-  const { toast } = useToast()
+  const router = useRouter()
   const [items, setItems] = useState<IUser[]>([]);
 
   const fetchItems = async () => {
@@ -39,8 +39,8 @@ const User = () => {
   }, []);
 
   return (
-    <section className="container space-y-4 my-8">
-      <Button asChild>
+    <section className="container my-8 space-y-4">
+      <Button onClick={() => router.push('/user/create')}>
         <Link href="/user/create">Tambah</Link>
       </Button>
 
