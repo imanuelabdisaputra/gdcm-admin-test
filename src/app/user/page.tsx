@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
 
 interface IUser {
   id: string;
@@ -21,26 +22,43 @@ interface IUser {
 }
 
 const User = () => {
-  const router = useRouter()
+  const router = useRouter();
+  const { toast } = useToast();
   const [items, setItems] = useState<IUser[]>([]);
 
   const fetchItems = async () => {
-    try {
-      const { data: users, error } = await supabase.from("users").select();
-      if (error) throw error;
-      if (users) setItems(users);
-    } catch (e: any) {
-      console.error("Error fetching users:", e.message);
+    const { data: users, error } = await supabase.from("users").select();
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Error fetching users: " + error.message,
+      });
+    }
+    if (users) setItems(users);
+  };
+
+  const onDelete = async (id: string) => {
+    const { error } = await supabase.from("users").delete().eq("id", id);
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Error deleting user: " + error.message,
+      });
+    } else {
+      await fetchItems();
     }
   };
 
   useEffect(() => {
     fetchItems();
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toast]);
 
   return (
     <section className="container my-8 space-y-4">
-      <Button onClick={() => router.push('/user/create')}>
+      <Button onClick={() => router.push("/user/create")}>
         <Link href="/user/create">Tambah</Link>
       </Button>
 
@@ -50,6 +68,7 @@ const User = () => {
             <TableHead>No</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Email</TableHead>
+            <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -58,6 +77,21 @@ const User = () => {
               <TableCell className="font-medium">{i + 1}</TableCell>
               <TableCell>{d.name}</TableCell>
               <TableCell>{d.email}</TableCell>
+              <TableCell className="space-x-2">
+                <Button
+                  type="button"
+                  onClick={() => router.push(`/user/${d.id}`)}
+                >
+                  Edit
+                </Button>
+                <Button
+                  type="button"
+                  variant={"destructive"}
+                  onClick={() => onDelete(d.id)}
+                >
+                  Delete
+                </Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
