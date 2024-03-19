@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 interface IUser {
   id: string;
   name: string;
-  email: string;
   created_at: string;
 }
 
@@ -19,7 +18,7 @@ const UserEdit = ({ params }: { params: { id: string } }) => {
   const onSubmit = async (data: IBodyUser) => {
     const {error} = await supabase
       .from("users")
-      .update([{ name: data.name, email: data.email }])
+      .update([{ name: data.name }])
       .eq('id', params.id)
       .select()
     if(error) {

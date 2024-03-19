@@ -9,8 +9,8 @@ import {
 } from "@tanstack/react-table";
 import supabase from "@/config/supabaseClient";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import format from "@/lib/format"
 import {
   Table,
   TableBody,
@@ -27,18 +27,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DotsVerticalIcon } from "@radix-ui/react-icons";
-import { Checkbox } from "@/components/ui/checkbox";
 
-interface IUser {
+interface IItems {
   id: string;
   name: string;
-  email: string;
+  date: string;
 }
 
 const User = () => {
   const router = useRouter();
   const { toast } = useToast();
-  const [items, setItems] = useState<IUser[]>([]);
+  const [items, setItems] = useState<IItems[]>([]);
   const [rowSelection, setRowSelection] = useState({})
 
   const columns: ColumnDef<any>[] = [
@@ -52,11 +51,11 @@ const User = () => {
       enableHiding: false,
     },
     {
-      accessorKey: "name",
-      header: "Nama",
+      accessorKey: "date",
+      header: "Tanggal",
       cell: ({ row }) => (
-        <div className="capitalize" onClick={() => router.push(`/user/${row.original.id}`)}>
-          {row.getValue("name")}
+        <div className="capitalize" onClick={() => router.push(`/attendance/${row.original.id}`)}>
+          {format(row.getValue("date"), 'PPP')}
         </div>
       ),
     },
@@ -72,7 +71,7 @@ const User = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onDelete(row.original.id)}>
+              <DropdownMenuItem onClick={() => onDelete(row.original.date)}>
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -93,7 +92,7 @@ const User = () => {
   });
 
   const fetchItems = async () => {
-    const { data: users, error } = await supabase.from("users").select();
+    const { data: users, error } = await supabase.from("attendance").select();
     if (error) {
       toast({
         variant: "destructive",
@@ -101,18 +100,38 @@ const User = () => {
         description: "Error fetching users: " + error.message,
       });
     }
-    if (users) setItems(users);
+    if (users) {
+      const seenDates = new Set(); // Efficiently store seen dates
+      const filteredData = users.filter((item) => {
+        const dateString = item.date; // Extract date string
+        if (!seenDates.has(dateString)) {
+          seenDates.add(dateString); // Add unique date to the set
+          return true; // Keep the item
+        }
+        return false; // Exclude duplicates
+      });
+      const data = filteredData.map(item => ({
+        ...item,
+      }))
+      setItems(data)
+    };
   };
 
-  const onDelete = async (id: string) => {
-    const { error } = await supabase.from("users").delete().eq("id", id);
+  const onDelete = async (date: string) => {
+    const d = format(date, 'yyyy-MM-dd')
+    const { error } = await supabase.from("attendance").delete().eq("date", d);
     if (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Error deleting user: " + error.message,
+        description: "Error deleting attendance: " + error.message,
       });
     } else {
+      toast({
+        variant: "default",
+        title: "Success",
+        description: "Successfully delete attendance",
+      });
       await fetchItems();
     }
   };
@@ -120,14 +139,14 @@ const User = () => {
   useEffect(() => {
     fetchItems();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [toast]);
+  }, []);
 
   return (
     <section className="container my-8 space-y-4">
       <div className="flex justify-between">
         <h1 className="text-3xl font-semibold">Jemaat</h1>
-        <Button onClick={() => router.push("/user/create")}>
-          <Link href="/user/create">Tambah</Link>
+        <Button onClick={() => router.push("/attendance/create")}>
+          Tambah
         </Button>
       </div>
 

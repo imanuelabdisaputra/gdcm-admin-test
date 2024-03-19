@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster"
+import Menu from "@/components/page/layout/menu"
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,7 +19,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <main>{children}</main>
+        <main className="relative h-full">
+          <nav className="relative flex items-center p-3 border-b">
+            <Menu />
+            <h1 className="absolute left-0 right-0 text-3xl font-semibold text-center -z-10">GDCM</h1>
+          </nav>
+          {children}
+        </main>
         <Toaster />
       </body>
     </html>

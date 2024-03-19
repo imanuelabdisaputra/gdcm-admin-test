@@ -9,6 +9,7 @@ import { useEffect } from "react";
 
 export type IBodyUser = {
   name?: string;
+  email?: string;
 };
 
 type UserProps = {
@@ -32,10 +33,11 @@ const User = ({ submit, item }: UserProps) => {
 
   useEffect(() => {
     setValue("name", item?.name);
-  }, [item?.name, setValue]);
+    setValue("email", item?.email);
+  }, [item?.email, item?.name, setValue]);
 
   return (
-    <section className="my-8">
+    <section className="container my-8">
       <Card className="w-[350px] mx-auto">
         <CardHeader>
           <CardTitle>Tambah User</CardTitle>
@@ -48,6 +50,12 @@ const User = ({ submit, item }: UserProps) => {
                 label="Nama"
                 placeholder="Nama"
                 errorMessage={errors.name && "This field is required"}
+              />
+              <Input
+                {...register("email", { required: true })}
+                label="Email"
+                placeholder="Email"
+                errorMessage={errors.email && "This field is required"}
               />
 
               <div className="flex justify-between">

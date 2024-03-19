@@ -10,7 +10,7 @@ const UserCreate = () => {
   const onSubmit = async (data: IBodyUser) => {
     await supabase
       .from("users")
-      .insert([{ name: data.name, email: data.email }])
+      .insert([{ name: data.name }])
       .select();
     router.push("/user");
   };

@@ -9,7 +9,6 @@ import {
 } from "@tanstack/react-table";
 import supabase from "@/config/supabaseClient";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Table,
@@ -20,14 +19,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { DotsVerticalIcon } from "@radix-ui/react-icons";
 import { Checkbox } from "@/components/ui/checkbox";
+import { DatePicker } from "@/components/ui/datePicker";
 
 interface IUser {
   id: string;
@@ -40,13 +33,27 @@ const User = () => {
   const { toast } = useToast();
   const [items, setItems] = useState<IUser[]>([]);
   const [rowSelection, setRowSelection] = useState({})
+  const [date, setDate] = useState<Date | null>(null)
 
   const columns: ColumnDef<any>[] = [
     {
-      id: "no",
-      header: 'No',
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
       cell: ({ row }) => (
-        <p>{row.index + 1}</p>
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
       ),
       enableSorting: false,
       enableHiding: false,
@@ -55,30 +62,10 @@ const User = () => {
       accessorKey: "name",
       header: "Nama",
       cell: ({ row }) => (
-        <div className="capitalize" onClick={() => router.push(`/user/${row.original.id}`)}>
+        <div className="capitalize">
           {row.getValue("name")}
         </div>
       ),
-    },
-    {
-      id: "actions",
-      enableHiding: false,
-      cell: ({ row }) => {
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
-                <DotsVerticalIcon className="w-4 h-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onDelete(row.original.id)}>
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
     },
   ];
 
@@ -104,18 +91,32 @@ const User = () => {
     if (users) setItems(users);
   };
 
-  const onDelete = async (id: string) => {
-    const { error } = await supabase.from("users").delete().eq("id", id);
+  const onSelect = async () => {
+    const selected = table.getFilteredSelectedRowModel()
+    const data = selected.rows.map(item => ({
+      name: item.original.id,
+      date: date,
+    }))
+    console.log(data)
+    const { error, data: attendance } = await supabase
+    .from('attendance')
+    .insert(data)
+    .select()
     if (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Error deleting user: " + error.message,
+        description: "Error create attendance: " + error.message,
       });
-    } else {
-      await fetchItems();
     }
-  };
+    if (attendance) {
+      router.push("/attendance");
+    }
+  }
+
+  const onSubmitAttendance = async (val: Date) => {
+    setDate(val);
+  }
 
   useEffect(() => {
     fetchItems();
@@ -125,11 +126,11 @@ const User = () => {
   return (
     <section className="container my-8 space-y-4">
       <div className="flex justify-between">
-        <h1 className="text-3xl font-semibold">Jemaat</h1>
-        <Button onClick={() => router.push("/user/create")}>
-          <Link href="/user/create">Tambah</Link>
-        </Button>
+        <h1 className="text-3xl font-semibold">Buat Absensi</h1>
+        <Button onClick={onSelect}>Simpan</Button>
       </div>
+
+      <DatePicker submit={onSubmitAttendance} />
 
       <Table>
         <TableHeader>
