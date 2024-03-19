@@ -24,6 +24,7 @@ import { DatePicker } from "@/components/ui/datePicker";
 
 
 interface IUser {
+  attendanceId: string
   id: string;
   name: string;
   email: string;
@@ -48,16 +49,21 @@ const AttendanceDetail = ({ params }: { params: { id: string } }) => {
             table.getIsAllPageRowsSelected() ||
             (table.getIsSomePageRowsSelected() && "indeterminate")
           }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          onCheckedChange={(value) => {
+            table.toggleAllPageRowsSelected(!!value)
+            setItems(items.map(item => ({
+              ...item,
+              selected: !!value
+            })))
+          }}
           aria-label="Select all"
         />
       ),
       cell: ({ row }) => {
         return (
           <Checkbox
-            checked={row.getIsSelected() || row.original.selected}
+            checked={row.original.selected || row.getIsSelected()}
             onCheckedChange={(value) => {
-              console.log(row.original)
               row.toggleSelected(!!value)
               setItems(items.map(item => ({
                 ...item,
@@ -105,7 +111,7 @@ const AttendanceDetail = ({ params }: { params: { id: string } }) => {
       const result = users.map(obj2 => {
         const matchingObj1 = attendance.find(obj1 => obj1.id === obj2.id);
         if (matchingObj1) {
-          return { ...obj2, selected: matchingObj1.selected };
+          return { ...obj2, selected: true };
         }
         return obj2;
       });
@@ -116,7 +122,7 @@ const AttendanceDetail = ({ params }: { params: { id: string } }) => {
 
   const fetchAttendance = async () => {
     setIsLoading(true)
-    const { data: attendance, error } = await supabase.from("attendance").select();
+    const { data: attendance, error } = await supabase.from("attendance").select().eq('id', params.id);
     if (error) {
       toast({
         variant: "destructive",
@@ -125,14 +131,10 @@ const AttendanceDetail = ({ params }: { params: { id: string } }) => {
       });
     }
     if (attendance) {
-      const attendById = attendance.filter(item => item.id == params.id)[0]
-      const items = attendance.filter(item => item.date == attendById.date)
-      const itemMap = items.map(item => ({
-        ...item,
-        id: item.name,
-        selected: true
+      const itemMap = attendance[0].names.map((item: any) => ({
+        id: item
       }))
-      const date = itemMap[0].date
+      const date = attendance[0].date
       setDate(date)
       await fetchItems(itemMap)
     };
@@ -145,13 +147,15 @@ const AttendanceDetail = ({ params }: { params: { id: string } }) => {
       return;
     }
     const selected = items.filter(item => item.selected)
-    const data = selected.map(item => ({
-      name: item.id,
+    const names = selected.map(item => item.id)
+    const data = {
+      id: params.id,
       date: date,
-    }))
+      names: names,
+    }
     const { error, data: attendance } = await supabase
     .from('attendance')
-    .insert(data)
+    .upsert(data)
     .select()
     if (error) {
       toast({
@@ -177,7 +181,7 @@ const AttendanceDetail = ({ params }: { params: { id: string } }) => {
   return (
     <section className="container my-8 space-y-4">
       <div className="flex justify-between">
-        <h1 className="text-3xl font-semibold">Buat Absensi</h1>
+        <h1 className="text-3xl font-semibold">Edit Absensi</h1>
         <Button onClick={onSelect}>Simpan</Button>
       </div>
 

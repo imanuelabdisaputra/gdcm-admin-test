@@ -93,14 +93,15 @@ const User = () => {
 
   const onSelect = async () => {
     const selected = table.getFilteredSelectedRowModel()
-    const data = selected.rows.map(item => ({
-      name: item.original.id,
+    const names = selected.rows.map(item => item.original.id)
+    const d = {
       date: date,
-    }))
-    console.log(data)
+      names: names || []
+    }
+    console.log(d)
     const { error, data: attendance } = await supabase
     .from('attendance')
-    .insert(data)
+    .insert(d)
     .select()
     if (error) {
       toast({

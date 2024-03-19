@@ -54,7 +54,7 @@ const User = () => {
       accessorKey: "date",
       header: "Tanggal",
       cell: ({ row }) => (
-        <div className="capitalize" onClick={() => router.push(`/attendance/${row.original.id}`)}>
+        <div className="capitalize">
           {format(row.getValue("date"), 'PPP')}
         </div>
       ),
@@ -144,7 +144,7 @@ const User = () => {
   return (
     <section className="container my-8 space-y-4">
       <div className="flex justify-between">
-        <h1 className="text-3xl font-semibold">Jemaat</h1>
+        <h1 className="text-3xl font-semibold">Absensi</h1>
         <Button onClick={() => router.push("/attendance/create")}>
           Tambah
         </Button>
@@ -176,6 +176,7 @@ const User = () => {
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
+                onClick={() => router.push(`/attendance/${row.original.id}`)}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
