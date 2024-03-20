@@ -1,6 +1,12 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
+import Spinner from '@/components/ui/spinner'
+
+export interface CollProps
+  extends React.HTMLAttributes<HTMLTableRowElement> {
+  colSpan: number
+}
 
 const Table = React.forwardRef<
   HTMLTableElement,
@@ -93,6 +99,44 @@ const TableCell = React.forwardRef<
 ))
 TableCell.displayName = "TableCell"
 
+const TableLoading = React.forwardRef<
+  HTMLTableRowElement,
+  CollProps
+>(({ className, colSpan, ...props }, ref) => (
+  <tr
+    ref={ref}
+    className={cn(
+      "h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
+      className
+    )}
+    {...props}
+  >
+    <td colSpan={colSpan} className="h-24 text-center">
+      <Spinner />
+    </td>
+  </tr>
+))
+TableLoading.displayName = "TableLoading"
+
+const TableEmpty = React.forwardRef<
+  HTMLTableRowElement,
+  CollProps
+>(({ className, colSpan, ...props }, ref) => (
+  <tr
+    ref={ref}
+    className={cn(
+      "h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
+      className
+    )}
+    {...props}
+  >
+    <td colSpan={colSpan} className="h-24 text-center">
+      <p>Tidak ada data</p>
+    </td>
+  </tr>
+))
+TableEmpty.displayName = "TableEmpty"
+
 const TableCaption = React.forwardRef<
   HTMLTableCaptionElement,
   React.HTMLAttributes<HTMLTableCaptionElement>
@@ -114,4 +158,6 @@ export {
   TableRow,
   TableCell,
   TableCaption,
+  TableLoading,
+  TableEmpty,
 }

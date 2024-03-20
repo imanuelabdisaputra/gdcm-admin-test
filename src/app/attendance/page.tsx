@@ -10,7 +10,7 @@ import {
 import supabase from "@/config/supabaseClient";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import format from "@/lib/format"
+import format from "@/lib/format";
 import {
   Table,
   TableBody,
@@ -18,6 +18,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableLoading,
+  TableEmpty,
 } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -38,15 +40,14 @@ const User = () => {
   const router = useRouter();
   const { toast } = useToast();
   const [items, setItems] = useState<IItems[]>([]);
-  const [rowSelection, setRowSelection] = useState({})
+  const [rowSelection, setRowSelection] = useState({});
+  const [loading, setLoading] = useState(true);
 
   const columns: ColumnDef<any>[] = [
     {
       id: "no",
-      header: 'No',
-      cell: ({ row }) => (
-        <p>{row.index + 1}</p>
-      ),
+      header: "No",
+      cell: ({ row }) => <p>{row.index + 1}</p>,
       enableSorting: false,
       enableHiding: false,
     },
@@ -54,9 +55,7 @@ const User = () => {
       accessorKey: "date",
       header: "Tanggal",
       cell: ({ row }) => (
-        <div className="capitalize">
-          {format(row.getValue("date"), 'PPP')}
-        </div>
+        <div className="capitalize">{format(row.getValue("date"), "PPP")}</div>
       ),
     },
     {
@@ -110,15 +109,17 @@ const User = () => {
         }
         return false; // Exclude duplicates
       });
-      const data = filteredData.map(item => ({
+      const data = filteredData.map((item) => ({
         ...item,
-      }))
-      setItems(data)
-    };
+      }));
+      setItems(data);
+      setLoading(false);
+    }
   };
 
   const onDelete = async (date: string) => {
-    const d = format(date, 'yyyy-MM-dd')
+    setLoading(true);
+    const d = format(date, "yyyy-MM-dd");
     const { error } = await supabase.from("attendance").delete().eq("date", d);
     if (error) {
       toast({
@@ -185,12 +186,10 @@ const User = () => {
                 ))}
               </TableRow>
             ))
+          ) : loading ? (
+            <TableLoading colSpan={columns.length} />
           ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
+            <TableEmpty colSpan={columns.length} />
           )}
         </TableBody>
       </Table>

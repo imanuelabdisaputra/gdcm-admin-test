@@ -34,6 +34,7 @@ const User = () => {
   const [items, setItems] = useState<IUser[]>([]);
   const [rowSelection, setRowSelection] = useState({})
   const [date, setDate] = useState<Date | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   const columns: ColumnDef<any>[] = [
     {
@@ -88,17 +89,20 @@ const User = () => {
         description: "Error fetching users: " + error.message,
       });
     }
-    if (users) setItems(users);
+    if (users) {
+      setItems(users)
+      setIsLoading(false)
+    };
   };
 
   const onSelect = async () => {
+    setIsLoading(true)
     const selected = table.getFilteredSelectedRowModel()
     const names = selected.rows.map(item => item.original.id)
     const d = {
       date: date,
       names: names || []
     }
-    console.log(d)
     const { error, data: attendance } = await supabase
     .from('attendance')
     .insert(d)
@@ -109,6 +113,7 @@ const User = () => {
         title: "Error",
         description: "Error create attendance: " + error.message,
       });
+      setIsLoading(false)
     }
     if (attendance) {
       router.push("/attendance");
@@ -128,7 +133,7 @@ const User = () => {
     <section className="container my-8 space-y-4">
       <div className="flex justify-between">
         <h1 className="text-3xl font-semibold">Buat Absensi</h1>
-        <Button onClick={onSelect}>Simpan</Button>
+        <Button disabled={isLoading} onClick={onSelect}>Simpan</Button>
       </div>
 
       <DatePicker submit={onSubmitAttendance} />
@@ -176,6 +181,7 @@ const User = () => {
           )}
         </TableBody>
       </Table>
+      <Button disabled={isLoading} onClick={() => router.push('/attendance')}>Back</Button>
     </section>
   );
 };

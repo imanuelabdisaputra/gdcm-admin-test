@@ -14,9 +14,10 @@ export type IBodyUser = {
 type UserProps = {
   submit: (data: IBodyUser) => void;
   item?: IBodyUser;
+  isLoading?: boolean
 };
 
-const User = ({ submit, item }: UserProps) => {
+const User = ({ submit, item, isLoading }: UserProps) => {
   const router = useRouter();
 
   const {
@@ -51,10 +52,11 @@ const User = ({ submit, item }: UserProps) => {
               />
 
               <div className="flex justify-between">
-                <Button type="submit">Submit</Button>
+                <Button type="submit" disabled={isLoading}>Submit</Button>
                 <Button
                   type="button"
                   variant={"secondary"}
+                  disabled={isLoading}
                   onClick={() => router.push("/user")}
                 >
                   Back

@@ -18,6 +18,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableLoading,
+  TableEmpty,
 } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -40,6 +42,7 @@ const User = () => {
   const { toast } = useToast();
   const [items, setItems] = useState<IUser[]>([]);
   const [rowSelection, setRowSelection] = useState({})
+  const [isLoading, setIsLoading] = useState(true)
 
   const columns: ColumnDef<any>[] = [
     {
@@ -101,10 +104,14 @@ const User = () => {
         description: "Error fetching users: " + error.message,
       });
     }
-    if (users) setItems(users);
+    if (users) {
+      setItems(users)
+    };
+    setIsLoading(false)
   };
 
   const onDelete = async (id: string) => {
+    setIsLoading(true)
     const { error } = await supabase.from("users").delete().eq("id", id);
     if (error) {
       toast({
@@ -126,7 +133,7 @@ const User = () => {
     <section className="container my-8 space-y-4">
       <div className="flex justify-between">
         <h1 className="text-3xl font-semibold">Jemaat</h1>
-        <Button onClick={() => router.push("/user/create")}>
+        <Button disabled={isLoading} onClick={() => router.push("/user/create")}>
           <Link href="/user/create">Tambah</Link>
         </Button>
       </div>
@@ -165,12 +172,10 @@ const User = () => {
                 ))}
               </TableRow>
             ))
+          ) : isLoading ? (
+            <TableLoading colSpan={columns.length} />
           ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
+            <TableEmpty colSpan={columns.length} />
           )}
         </TableBody>
       </Table>

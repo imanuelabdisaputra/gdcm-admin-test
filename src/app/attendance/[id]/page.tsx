@@ -17,6 +17,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableLoading,
+  TableEmpty,
 } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -223,12 +225,10 @@ const AttendanceDetail = ({ params }: { params: { id: string } }) => {
                 ))}
               </TableRow>
             ))
+          ) : isLoading ? (
+            <TableLoading colSpan={columns.length} />
           ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
+            <TableEmpty colSpan={columns.length} />
           )}
         </TableBody>
       </Table>
