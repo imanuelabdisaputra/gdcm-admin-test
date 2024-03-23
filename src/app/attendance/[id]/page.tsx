@@ -181,7 +181,7 @@ const AttendanceDetail = ({ params }: { params: { id: string } }) => {
   }, []);
 
   return (
-    <section className="container my-8 space-y-4">
+    <div className="space-y-4">
       <div className="flex justify-between">
         <h1 className="text-3xl font-semibold">Edit Absensi</h1>
         <Button onClick={onSelect}>Simpan</Button>
@@ -235,7 +235,7 @@ const AttendanceDetail = ({ params }: { params: { id: string } }) => {
       <Button onClick={() => router.push("/attendance")}>
         Back
       </Button>
-    </section>
+    </div>
   );
 };
 

@@ -36,37 +36,35 @@ const User = ({ submit, item, isLoading }: UserProps) => {
   }, [item?.name, setValue]);
 
   return (
-    <section className="my-8">
-      <Card className="w-[350px] mx-auto">
-        <CardHeader>
-          <CardTitle>Tambah User</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="space-y-4">
-              <Input
-                {...register("name", { required: true })}
-                label="Nama"
-                placeholder="Nama"
-                errorMessage={errors.name && "This field is required"}
-              />
+    <Card className="max-w-[350px] mx-auto">
+      <CardHeader>
+        <CardTitle>Tambah User</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="space-y-4">
+            <Input
+              {...register("name", { required: true })}
+              label="Nama"
+              placeholder="Nama"
+              errorMessage={errors.name && "This field is required"}
+            />
 
-              <div className="flex justify-between">
-                <Button type="submit" disabled={isLoading}>Submit</Button>
-                <Button
-                  type="button"
-                  variant={"secondary"}
-                  disabled={isLoading}
-                  onClick={() => router.push("/user")}
-                >
-                  Back
-                </Button>
-              </div>
+            <div className="flex justify-between">
+              <Button type="submit" disabled={isLoading}>Submit</Button>
+              <Button
+                type="button"
+                variant={"secondary"}
+                disabled={isLoading}
+                onClick={() => router.push("/user")}
+              >
+                Back
+              </Button>
             </div>
-          </form>
-        </CardContent>
-      </Card>
-    </section>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 

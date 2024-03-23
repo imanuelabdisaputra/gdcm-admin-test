@@ -143,7 +143,7 @@ const User = () => {
   }, []);
 
   return (
-    <section className="container my-8 space-y-4">
+    <div className="space-y-4">
       <div className="flex justify-between">
         <h1 className="text-3xl font-semibold">Absensi</h1>
         <Button onClick={() => router.push("/attendance/create")}>
@@ -193,7 +193,7 @@ const User = () => {
           )}
         </TableBody>
       </Table>
-    </section>
+    </div>
   );
 };
 

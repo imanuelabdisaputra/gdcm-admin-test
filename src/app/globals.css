@@ -94,3 +94,23 @@
     }
   }
 }
+
+.fc-timegrid-slot-label-frame.fc-scrollgrid-shrink-frame {
+  margin-top: -26px;
+  background: #fff;
+}
+
+.fc .fc-timegrid-slot-label-cushion {
+  font-size: 12px;
+  /* width: 100%; */
+  text-align: center;
+  background: #fff;
+}
+
+.fc .fc-timegrid-slot-minor {
+  border-top-style: unset;
+}
+
+.fc .fc-toolbar.fc-header-toolbar {
+  margin-bottom: 14px;
+}

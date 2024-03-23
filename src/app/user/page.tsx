@@ -130,7 +130,7 @@ const User = () => {
   }, [toast]);
 
   return (
-    <section className="container my-8 space-y-4">
+    <div className="space-y-4">
       <div className="flex justify-between">
         <h1 className="text-3xl font-semibold">Jemaat</h1>
         <Button disabled={isLoading} onClick={() => router.push("/user/create")}>
@@ -179,7 +179,7 @@ const User = () => {
           )}
         </TableBody>
       </Table>
-    </section>
+    </div>
   );
 };
 

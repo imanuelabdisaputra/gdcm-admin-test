@@ -24,7 +24,9 @@ export default function RootLayout({
             <Menu />
             <h1 className="absolute left-0 right-0 text-3xl font-semibold text-center -z-10">GDCM</h1>
           </nav>
-          {children}
+          <section className="p-4 sm:container sm:py-6">
+            {children}
+          </section>
         </main>
         <Toaster />
       </body>

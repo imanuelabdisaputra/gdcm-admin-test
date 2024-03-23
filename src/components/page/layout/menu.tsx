@@ -26,6 +26,10 @@ const menus: IMenu[] = [
     title: "Attendance",
     to: "/attendance",
   },
+  {
+    title: "Schedule",
+    to: "/schedule",
+  },
 ];
 
 const MenuComponent = () => {
