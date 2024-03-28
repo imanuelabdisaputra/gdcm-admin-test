@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DatePicker } from "@/components/ui/datePicker"
 import Timepicker from "@/components/ui/timepicker"
+import { toast } from "@/components/ui/use-toast";
 
 export type IScheduleItem = {
   name: string
@@ -42,12 +43,22 @@ const ScheduleFormComponent = ({ submit, item, isLoading }: IProps) => {
   }
 
   const onSubmit: SubmitHandler<IScheduleItem> = async (data) => {
-    const item = {
-      ...data,
-      startTime: startTime || '',
-      endTime: endTime || '',
+    const start = startTime!.replace(':', '')
+    const end = endTime!.replace(':', '')
+    if (start < end) {
+      const item = {
+        ...data,
+        startTime: startTime || '',
+        endTime: endTime || '',
+      }
+      submit(item);
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Jam selesai harus lebih besar dari jam mulai",
+      });
     }
-    submit(item);
   }
 
   useEffect(() => {

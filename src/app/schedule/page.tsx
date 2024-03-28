@@ -13,10 +13,12 @@ import { useToast } from "@/components/ui/use-toast"
 import Spinner from "@/components/ui/spinner"
 import formatDate from "@/lib/format"
 import allLocales from "@fullcalendar/core/locales-all"
+import { Trash2 } from "lucide-react"
 
 import {
   Dialog,
   DialogContent,
+  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
 
@@ -62,6 +64,7 @@ const SchedulePage = () => {
       const data = schedule.map((item) => {
         const date = formatDate(item.date, "yyyy-MM-dd")
         return {
+          id: item.id,
           title: item.name,
           start: `${date}T${item.start_time}`,
           end: `${date}T${item.end_time}`,
@@ -81,6 +84,28 @@ const SchedulePage = () => {
     console.log(val)
   }
 
+  const onDelete = async () => {
+    const { error } = await supabase
+      .from("schedule")
+      .delete()
+      .eq("id", detail.event.id)
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Error fetching schedule: " + error.message,
+      })
+    } else {
+      fetchItems()
+      setModal(false)
+      toast({
+        variant: "default",
+        title: "Success",
+        description: "Berhasil menghapus",
+      })
+    }
+  }
+
   useEffect(() => {
     fetchItems()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -88,7 +113,7 @@ const SchedulePage = () => {
 
   return (
     <section className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <p className="text-2xl font-semibold">Schedule</p>
         <Button onClick={() => router.push("/schedule/create")}>Create</Button>
       </div>
@@ -119,18 +144,19 @@ const SchedulePage = () => {
 
       {modal && (
         <Dialog open={modal} onOpenChange={setModal}>
-          <DialogContent>
-              <DialogTitle>{detail.event.title}</DialogTitle>
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                <div>
-                  <p className="font-medium">Tanggal</p>
-                  <p>{formatDate(detail.event.start)}</p>
-                </div>
-                <div>
-                  <p className="font-medium">Jam</p>
-                  <p>{formatDate(detail.event.start, 'HH:mm')} - {formatDate(detail.event.end, 'HH:mm')}</p>
-                </div>
-              </div>
+          <DialogContent className="h-screen md:h-auto">
+            <DialogHeader>
+              <Button variant="ghost" size="icon" onClick={() => onDelete()}>
+                <Trash2 className="w-6 h-6" />
+              </Button>
+            </DialogHeader>
+
+            <DialogTitle>{detail.event.title}</DialogTitle>
+            <p className="mt-2">
+              {formatDate(detail.event.start, "eeee, dd MMMM")} ⋅{" "}
+              {formatDate(detail.event.start, "HH:mm")} -{" "}
+              {formatDate(detail.event.end, "HH:mm")}
+            </p>
           </DialogContent>
         </Dialog>
       )}

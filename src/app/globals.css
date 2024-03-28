@@ -98,11 +98,12 @@
 .fc-timegrid-slot-label-frame.fc-scrollgrid-shrink-frame {
   margin-top: -26px;
   background: #fff;
+  text-align: left;
 }
 
 .fc .fc-timegrid-slot-label-cushion {
   font-size: 12px;
-  /* width: 100%; */
+  /* width: 42px; */
   text-align: center;
   background: #fff;
 }
@@ -115,7 +116,7 @@
   margin-bottom: 14px;
 }
 
-a.fc-event.fc-event-start.fc-event-end.fc-event-future.fc-timegrid-event.fc-v-event {
+a.fc-event {
   cursor: pointer;
   padding: 4px;
 }

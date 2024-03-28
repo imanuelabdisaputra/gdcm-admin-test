@@ -30,6 +30,11 @@ const CreateSchedulePage = () => {
       });
       setIsLoading(false)
     } else {
+      toast({
+        variant: "default",
+        title: "Success",
+        description: "Berhasil membuat jadwal",
+      });
       router.push("/schedule");
     }
   };
