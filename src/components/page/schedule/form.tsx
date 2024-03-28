@@ -8,23 +8,26 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DatePicker } from "@/components/ui/datePicker"
+import Timepicker from "@/components/ui/timepicker"
 
 export type IScheduleItem = {
-  name?: string
-  date?: Date
-  startTime?: string
-  endTime?: string
+  name: string
+  date: Date
+  startTime: string
+  endTime: string
 }
 
-type UserProps = {
+type IProps = {
   submit: (data: IScheduleItem) => void
   item?: IScheduleItem
   isLoading?: boolean
 }
 
-const ScheduleFormComponent = ({ submit, item, isLoading }: UserProps) => {
+const ScheduleFormComponent = ({ submit, item, isLoading }: IProps) => {
   const router = useRouter()
   const [date, setDate] = useState<Date | undefined>()
+  const [startTime, setStartTime] = useState<string>()
+  const [endTime, setEndTime] = useState<string>()
 
   const {
     register,
@@ -39,12 +42,17 @@ const ScheduleFormComponent = ({ submit, item, isLoading }: UserProps) => {
   }
 
   const onSubmit: SubmitHandler<IScheduleItem> = async (data) => {
-    submit(data);
+    const item = {
+      ...data,
+      startTime: startTime || '',
+      endTime: endTime || '',
+    }
+    submit(item);
   }
 
   useEffect(() => {
-    setValue("name", item?.name)
-  }, [item?.name, setValue])
+    item && setValue("name", item.name)
+  }, [item, item?.name, setValue])
 
   return (
     <Card className="max-w-[350px] mx-auto">
@@ -65,17 +73,15 @@ const ScheduleFormComponent = ({ submit, item, isLoading }: UserProps) => {
               errorMessage={errors.date && "This field is required"}
               submit={onSubmitDate}
             />
-            <Input
-              {...register("startTime", { required: true })}
+            <Timepicker
               label="Jam Mulai"
               placeholder="Masukan Jam Mulai"
-              errorMessage={errors.startTime && "This field is required"}
+              onChange={(val) => setStartTime(val)}
             />
-            <Input
-              {...register("endTime", { required: true })}
+            <Timepicker
               label="Jam Selesai"
               placeholder="Masukan Jam Selesai"
-              errorMessage={errors.endTime && "This field is required"}
+              onChange={(val) => setEndTime(val)}
             />
 
             <div className="flex justify-between">

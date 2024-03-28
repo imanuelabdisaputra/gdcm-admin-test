@@ -29,11 +29,12 @@ const CreateSchedulePage = () => {
         description: "Error submiting: " + error.message,
       });
       setIsLoading(false)
+    } else {
+      router.push("/schedule");
     }
-    router.push("/schedule");
   };
   return (
-    <ScheduleFormComponent submit={onSubmit} />
+    <ScheduleFormComponent isLoading={isLoading} submit={onSubmit} />
   )
 }
 

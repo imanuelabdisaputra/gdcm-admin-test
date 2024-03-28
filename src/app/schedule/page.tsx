@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 
 import FullCalendar from "@fullcalendar/react"
 import timeGridPlugin from "@fullcalendar/timegrid"
+import interactionPlugin from "@fullcalendar/interaction"
 
 import supabase from "@/config/supabaseClient"
 import { Button } from "@/components/ui/button"
@@ -76,6 +77,10 @@ const SchedulePage = () => {
     setDetail(val)
   }
 
+  const onDateClick = (val: any) => {
+    console.log(val)
+  }
+
   useEffect(() => {
     fetchItems()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -91,38 +96,39 @@ const SchedulePage = () => {
       {loading ? (
         <Spinner />
       ) : (
-        <FullCalendar
-          plugins={[timeGridPlugin]}
-          initialView="timeGridWeek"
-          headerToolbar={header}
-          titleFormat={titleFormat}
-          height="auto"
-          dayHeaderFormat={dayHeader}
-          nowIndicator
-          allDaySlot={false}
-          slotLabelFormat={labelFormat}
-          events={items}
-          locales={allLocales}
-          locale="id"
-          eventClick={onClick}
-        />
+        <>
+          <FullCalendar
+            plugins={[timeGridPlugin, interactionPlugin]}
+            initialView="timeGridWeek"
+            headerToolbar={header}
+            titleFormat={titleFormat}
+            height="auto"
+            dayHeaderFormat={dayHeader}
+            nowIndicator
+            allDaySlot={false}
+            slotLabelFormat={labelFormat}
+            events={items}
+            locales={allLocales}
+            locale="id"
+            selectable
+            eventClick={onClick}
+            dateClick={onDateClick}
+          />
+        </>
       )}
 
       {modal && (
         <Dialog open={modal} onOpenChange={setModal}>
           <DialogContent>
               <DialogTitle>{detail.event.title}</DialogTitle>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="col-span-2">
-                  <p>Tanggal: {formatDate(detail.event.start)}</p>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                <div>
+                  <p className="font-medium">Tanggal</p>
+                  <p>{formatDate(detail.event.start)}</p>
                 </div>
                 <div>
-                  <p>Jam Mulai</p>
-                  <p>{formatDate(detail.event.start, 'HH:mm')}</p>
-                </div>
-                <div>
-                  <p>Jam Selesai</p>
-                  <p>{formatDate(detail.event.end, 'HH:mm')}</p>
+                  <p className="font-medium">Jam</p>
+                  <p>{formatDate(detail.event.start, 'HH:mm')} - {formatDate(detail.event.end, 'HH:mm')}</p>
                 </div>
               </div>
           </DialogContent>

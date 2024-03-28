@@ -23,6 +23,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DatePicker } from "@/components/ui/datePicker";
+import { Badge } from "@/components/ui/badge";
 
 
 interface IUser {
@@ -83,8 +84,9 @@ const AttendanceDetail = ({ params }: { params: { id: string } }) => {
       accessorKey: "name",
       header: "Nama",
       cell: ({ row }) => (
-        <div className="capitalize">
+        <div className="flex justify-between items-center capitalize">
           {row.getValue("name")}
+          {row.original.selected && <Badge variant="green">Hadir</Badge>}
         </div>
       ),
     },
