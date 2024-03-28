@@ -114,3 +114,8 @@
 .fc .fc-toolbar.fc-header-toolbar {
   margin-bottom: 14px;
 }
+
+a.fc-event.fc-event-start.fc-event-end.fc-event-future.fc-timegrid-event.fc-v-event {
+  cursor: pointer;
+  padding: 4px;
+}
