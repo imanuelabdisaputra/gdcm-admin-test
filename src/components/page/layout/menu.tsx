@@ -66,7 +66,7 @@ const MenuComponent = ({ isMobile }: { isMobile?: boolean }) => {
               key={i}
               href={item.to}
               className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground ${
-                path == item.to ? `bg-muted !text-primary` : ""
+                path.includes(item.to) ? `bg-muted !text-primary` : ""
               }`}
               onClick={() => onClickMenu(item)}
             >
@@ -84,7 +84,7 @@ const MenuComponent = ({ isMobile }: { isMobile?: boolean }) => {
           key={i}
           href={item.to}
           className={`flex items-center gap-3 px-3 py-2 transition-all rounded-lg text-muted-foreground hover:text-primary ${
-            path == item.to ? `bg-muted !text-primary` : ""
+            path.includes(item.to) ? `bg-muted !text-primary` : ""
           }`}
         >
           <item.icon className="w-4 h-4" />
