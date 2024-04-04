@@ -11,7 +11,6 @@ export default function Home() {
 
   const getUser = async () => {
     const { data: { user }, error } = await supabase.auth.getUser()
-    console.log(user)
     if (error) {
       toast({
         variant: "destructive",
