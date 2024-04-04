@@ -1,30 +1,6 @@
 import type { Metadata } from "next"
-import Image from "next/image"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { Toaster } from "@/components/ui/toaster"
-import MenuComponent from "@/components/page/layout/menu"
-import Logo from "@/assets/logo.png"
-
-import Link from "next/link"
-import { CircleUser } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -41,53 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="grid h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-          <div className="hidden border-r bg-muted/40 md:block">
-            <div className="flex flex-col h-full max-h-screen gap-2">
-              <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-                <Link
-                  href="/"
-                  className="flex items-center gap-2 font-semibold"
-                >
-                  <Image src={Logo} alt="" width={32} height={32} />
-                  <span className="">GDCM</span>
-                </Link>
-              </div>
-              <div className="flex-1">
-                <MenuComponent />
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col overflow-hidden">
-            <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 justify-between md:justify-end">
-              <MenuComponent isMobile />
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="rounded-full"
-                  >
-                    <CircleUser className="w-5 h-5" />
-                    <span className="sr-only">Toggle user menu</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
-                  <DropdownMenuItem>Support</DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>Logout</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </header>
-            <main className="relative flex flex-col flex-1 gap-4 overflow-scroll lg:gap-6">
-              <section className="p-4 sm:container sm:py-6">{children}</section>
-            </main>
-          </div>
-        </div>
-        <Toaster />
+        {children}
       </body>
     </html>
   )
