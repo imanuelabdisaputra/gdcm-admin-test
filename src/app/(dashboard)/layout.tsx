@@ -23,6 +23,7 @@ import {
 import supabase from "@/config/supabaseClient"
 import { toast } from "@/components/ui/use-toast"
 import { useProfile } from "@/store/useProfile"
+import { useAuth } from "@/store/useAuth"
 
 export default function RootLayout({
   children,
@@ -31,6 +32,7 @@ export default function RootLayout({
 }>) {
   const router = useRouter()
   const { setProfile } = useProfile()
+  const { logout } = useAuth()
 
   const getUser = async () => {
     const {
@@ -48,19 +50,6 @@ export default function RootLayout({
     if (user) {
       setProfile(user)
       router.push("/user")
-    }
-  }
-
-  const onLogout = async () => {
-    let { error } = await supabase.auth.signOut()
-    if (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Error: " + error.message,
-      })
-    } else {
-      router.push("/auth/login")
     }
   }
 
@@ -105,7 +94,7 @@ export default function RootLayout({
                 <DropdownMenuItem>Settings</DropdownMenuItem>
                 <DropdownMenuItem>Support</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => onLogout()}>
+                <DropdownMenuItem onClick={() => logout(router)}>
                   Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useForm, SubmitHandler } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod";
 import supabase from "@/config/supabaseClient"
 import { toast } from "@/components/ui/use-toast"
 
@@ -15,29 +16,36 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useProfile } from "@/store/useProfile"
+import { useAuth } from "@/store/useAuth"
+import { FormSchema } from './types'
 
 export interface IForm {
-  email: string
   password: string
+  confirmPassword: string
 }
 
-const LoginForm = () => {
+const ResetPasswordForm = () => {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const params = useSearchParams()
   const { setProfile } = useProfile()
+  const { logout } = useAuth()
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<IForm>()
+  } = useForm<IForm>({
+    resolver: zodResolver(FormSchema)
+  })
 
   const onSubmit: SubmitHandler<IForm> = async (val) => {
     setIsLoading(true)
-    let { data, error } = await supabase.auth.signInWithPassword({
-      email: val.email,
+    const query = params.get('email')
+    const { data, error } = await supabase.auth.updateUser({
+      email: String(query),
       password: val.password,
     })
     if (error) {
@@ -50,34 +58,34 @@ const LoginForm = () => {
     }
     if (data) {
       setProfile(data)
+      logout(router)
       router.push("/")
     }
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-sm">
+    <form noValidate onSubmit={handleSubmit(onSubmit)} className="w-full max-w-sm">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
+          <CardTitle className="text-2xl">Reset Password</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account.
+            Enter your new password.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col space-y-4">
           <Input
-            {...register("email", { required: true })}
-            label="Email"
-            type="email"
-            placeholder="m@example.com"
-            required
-            errorMessage={errors.email && "This field is required"}
-          />
-          <Input
             {...register("password", { required: true })}
-            label="Password"
+            label="New Password"
             type="password"
             required
-            errorMessage={errors.password && "This field is required"}
+            errorMessage={errors.password?.message}
+          />
+          <Input
+            {...register("confirmPassword", { required: true })}
+            label="Confirm Password"
+            type="password"
+            required
+            errorMessage={errors.confirmPassword?.message}
           />
         </CardContent>
         <CardFooter>
@@ -90,4 +98,4 @@ const LoginForm = () => {
   )
 }
 
-export default LoginForm
+export default ResetPasswordForm
