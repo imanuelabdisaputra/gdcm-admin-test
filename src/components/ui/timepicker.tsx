@@ -1,4 +1,6 @@
+import React from "react"
 import { useEffect, useState } from "react"
+import { FieldError } from "react-hook-form"
 import {
   Select,
   SelectContent,
@@ -12,14 +14,15 @@ import { Label } from "./label"
 interface IProps {
   label: string
   placeholder?: string
-  onChange: (val: string) => void
+  error?: FieldError
+  onChange?: (val: string) => void
 }
 
-function CustomTimePicker({ label, placeholder, onChange }: IProps) {
+function CustomTimePicker({ label, placeholder, onChange, error }: IProps) {
   const [times, setTimes] = useState<string[]>([])
 
   const onChangeSelect = (val: string) => {
-    onChange(val)
+    onChange && onChange(val)
   }
 
   useEffect(() => {
@@ -54,11 +57,12 @@ function CustomTimePicker({ label, placeholder, onChange }: IProps) {
                 {item}
               </SelectItem>
             ))
-            // <SelectGroup>
-            // </SelectGroup>
           )}
         </SelectContent>
       </Select>
+      {error && (
+          <p className="mt-1 text-xs text-red-600">{error.message}</p>
+        )}
     </div>
   )
 }

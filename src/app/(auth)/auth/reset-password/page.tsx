@@ -78,14 +78,14 @@ const ResetPasswordForm = () => {
             label="New Password"
             type="password"
             required
-            errorMessage={errors.password?.message}
+            error={errors.password}
           />
           <Input
             {...register("confirmPassword", { required: true })}
             label="Confirm Password"
             type="password"
             required
-            errorMessage={errors.confirmPassword?.message}
+            error={errors.confirmPassword}
           />
         </CardContent>
         <CardFooter>

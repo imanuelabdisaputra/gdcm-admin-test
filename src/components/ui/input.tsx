@@ -1,4 +1,5 @@
 import * as React from "react";
+import { FieldError } from "react-hook-form";
 
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
@@ -6,12 +7,12 @@ import { Label } from "@/components/ui/label";
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
-  errorMessage?: string;
+  error?: FieldError;
   containerClass?: string;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ label, errorMessage, className, type, ...props }, ref) => {
+  ({ label, className, error, type, ...props }, ref) => {
     return (
       <div>
         {label && <Label>{label}</Label>}
@@ -24,8 +25,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           {...props}
         />
-        {errorMessage && (
-          <p className="mt-1 text-xs text-red-600">{errorMessage}</p>
+        {error && (
+          <p className="mt-1 text-xs text-red-600">{error.message}</p>
         )}
       </div>
     );

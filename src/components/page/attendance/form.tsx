@@ -49,13 +49,13 @@ const User = ({ submit, item }: UserProps) => {
                 {...register("name", { required: true })}
                 label="Nama"
                 placeholder="Nama"
-                errorMessage={errors.name && "This field is required"}
+                error={errors.name}
               />
               <Input
                 {...register("email", { required: true })}
                 label="Email"
                 placeholder="Email"
-                errorMessage={errors.email && "This field is required"}
+                error={errors.email}
               />
 
               <div className="flex justify-between">

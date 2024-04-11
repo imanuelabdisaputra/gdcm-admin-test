@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useForm, SubmitHandler } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import supabase from "@/config/supabaseClient"
 import { toast } from "@/components/ui/use-toast"
 
@@ -17,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { useRouter } from "next/navigation"
 import { useProfile } from "@/store/useProfile"
+import { FormSchema } from "./types"
 
 export interface IForm {
   email: string
@@ -32,7 +34,9 @@ const LoginForm = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<IForm>()
+  } = useForm<IForm>({
+    resolver: zodResolver(FormSchema),
+  })
 
   const onSubmit: SubmitHandler<IForm> = async (val) => {
     setIsLoading(true)
@@ -54,8 +58,31 @@ const LoginForm = () => {
     }
   }
 
+  const loginWithGoogle = async () => {
+    let { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+    })
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Error: " + error.message,
+      })
+      setIsLoading(false)
+    }
+    if (data) {
+      setProfile(data)
+      console.log(data)
+      router.push("/")
+    }
+  }
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-sm">
+    <form
+      noValidate
+      onSubmit={handleSubmit(onSubmit)}
+      className="w-full max-w-sm"
+    >
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
@@ -65,24 +92,34 @@ const LoginForm = () => {
         </CardHeader>
         <CardContent className="flex flex-col space-y-4">
           <Input
-            {...register("email", { required: true })}
+            {...register("email")}
             label="Email"
             type="email"
             placeholder="m@example.com"
             required
-            errorMessage={errors.email && "This field is required"}
+            error={errors.email}
           />
           <Input
-            {...register("password", { required: true })}
+            {...register("password")}
             label="Password"
             type="password"
             required
-            errorMessage={errors.password && "This field is required"}
+            error={errors.password}
           />
         </CardContent>
-        <CardFooter>
+        <CardFooter className="flex-col gap-4">
           <Button type="submit" disabled={isLoading} className="w-full">
             Sign in
+          </Button>
+          <div className="w-full h-px bg-slate-200" />
+          <Button
+            type="button"
+            variant="outline"
+            disabled
+            className="w-full"
+            onClick={loginWithGoogle}
+          >
+            Login with Google
           </Button>
         </CardFooter>
       </Card>
