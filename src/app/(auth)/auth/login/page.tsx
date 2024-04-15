@@ -115,7 +115,6 @@ const LoginForm = () => {
           <Button
             type="button"
             variant="outline"
-            disabled
             className="w-full"
             onClick={loginWithGoogle}
           >
