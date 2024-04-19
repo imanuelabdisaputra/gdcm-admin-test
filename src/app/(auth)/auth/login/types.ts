@@ -13,3 +13,10 @@ export const FormSchema: ZodType<FormData> = z
       .min(6, { message: "Password is too short" })
       .max(20, { message: "Password is too long" }),
   })
+
+export const FormSchemaPhone: ZodType<{phone: string}> = z
+  .object({
+    phone: z.string().min(1, {
+      message: 'Required'
+    }),
+  })

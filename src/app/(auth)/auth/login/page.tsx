@@ -18,32 +18,55 @@ import {
 import { Input } from "@/components/ui/input"
 import { useRouter } from "next/navigation"
 import { useProfile } from "@/store/useProfile"
-import { FormSchema } from "./types"
+import { FormSchema, FormSchemaPhone } from "./types"
 
 export interface IForm {
-  email: string
-  password: string
+  email?: string
+  password?: string
+  phone?: string
 }
 
 const LoginForm = () => {
-  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { setProfile } = useProfile()
+  const [loginWithPhone, setLoginWithPhone] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const {
+    getValues,
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<IForm>({
-    resolver: zodResolver(FormSchema),
+    resolver: zodResolver(loginWithPhone ? FormSchemaPhone : FormSchema),
   })
+
+  function formatPhoneNumber(phoneNumber: string) {
+    if (phoneNumber.startsWith("+62")) {
+      return phoneNumber
+    } else {
+      return phoneNumber.replace(/^0/, "+62")
+    }
+  }
 
   const onSubmit: SubmitHandler<IForm> = async (val) => {
     setIsLoading(true)
-    let { data, error } = await supabase.auth.signInWithPassword({
-      email: val.email,
-      password: val.password,
-    })
+    let error
+    let data
+    if (loginWithPhone) {
+      const res = await supabase.auth.signInWithOtp({
+        phone: formatPhoneNumber(val.phone ?? ""),
+      })
+      error = res.error
+      data = res.data
+    } else {
+      const res = await supabase.auth.signInWithPassword({
+        email: val.email ?? "",
+        password: val.password ?? "",
+      })
+      error = res.error
+      data = res.data
+    }
     if (error) {
       toast({
         variant: "destructive",
@@ -53,8 +76,12 @@ const LoginForm = () => {
       setIsLoading(false)
     }
     if (data) {
-      setProfile(data)
-      router.push("/")
+      loginWithPhone
+        ? (
+          localStorage.setItem('phone', getValues('phone') ?? ''),
+          router.push("/auth/otp")
+        )
+        : (setProfile(data), router.push("/"))
     }
   }
 
@@ -77,6 +104,10 @@ const LoginForm = () => {
     }
   }
 
+  const onLoginWithPhone = () => {
+    setLoginWithPhone(!loginWithPhone)
+  }
+
   return (
     <form
       noValidate
@@ -91,21 +122,33 @@ const LoginForm = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col space-y-4">
-          <Input
-            {...register("email")}
-            label="Email"
-            type="email"
-            placeholder="m@example.com"
-            required
-            error={errors.email}
-          />
-          <Input
-            {...register("password")}
-            label="Password"
-            type="password"
-            required
-            error={errors.password}
-          />
+          {loginWithPhone ? (
+            <Input
+              {...register("phone")}
+              label="Phone"
+              type="phone"
+              required
+              error={errors.phone}
+            />
+          ) : (
+            <>
+              <Input
+                {...register("email")}
+                label="Email"
+                type="email"
+                placeholder="m@example.com"
+                required
+                error={errors.email}
+              />
+              <Input
+                {...register("password")}
+                label="Password"
+                type="password"
+                required
+                error={errors.password}
+              />
+            </>
+          )}
         </CardContent>
         <CardFooter className="flex-col gap-4">
           <Button type="submit" disabled={isLoading} className="w-full">
@@ -116,9 +159,17 @@ const LoginForm = () => {
             type="button"
             variant="outline"
             className="w-full"
+            onClick={onLoginWithPhone}
+          >
+            Sign in with {loginWithPhone ? "Email" : "Phone"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
             onClick={loginWithGoogle}
           >
-            Login with Google
+            Google
           </Button>
         </CardFooter>
       </Card>
