@@ -19,6 +19,7 @@ const config = {
     },
     extend: {
       colors: {
+        facebook: '#3b5998',
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

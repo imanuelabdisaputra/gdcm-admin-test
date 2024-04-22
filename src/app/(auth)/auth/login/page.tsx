@@ -19,6 +19,9 @@ import { Input } from "@/components/ui/input"
 import { useRouter } from "next/navigation"
 import { useProfile } from "@/store/useProfile"
 import { FormSchema, FormSchemaPhone } from "./types"
+import Google from '@/assets/google-logo.png'
+import Facebook from '@/assets/facebook-logo.png'
+import Image from "next/image"
 
 export interface IForm {
   email?: string
@@ -85,9 +88,9 @@ const LoginForm = () => {
     }
   }
 
-  const loginWithGoogle = async () => {
+  const loginWithProvider = async (provider: 'google' | 'facebook') => {
     let { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
+      provider: provider,
     })
     if (error) {
       toast({
@@ -167,9 +170,19 @@ const LoginForm = () => {
             type="button"
             variant="outline"
             className="w-full"
-            onClick={loginWithGoogle}
+            onClick={() => loginWithProvider('google')}
           >
-            Google
+            <Image src={Google} alt="google logo" height={16} width={16} />
+            Sign in with Google
+          </Button>
+          <Button
+            type="button"
+            variant="facebook"
+            className="w-full"
+            onClick={() => loginWithProvider('facebook')}
+          >
+            <Image src={Facebook} alt="google logo" height={16} width={16} />
+            Sign in with Facebook
           </Button>
         </CardFooter>
       </Card>
