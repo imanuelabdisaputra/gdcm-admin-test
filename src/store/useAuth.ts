@@ -16,6 +16,7 @@ export const useAuth = create<IProfile>()((set) => ({
         description: "Error: " + error.message,
       })
     } else {
+      localStorage.clear()
       router.push("/auth/login")
     }
   },

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
@@ -24,6 +24,7 @@ import supabase from "@/config/supabaseClient"
 import { toast } from "@/components/ui/use-toast"
 import { useProfile } from "@/store/useProfile"
 import { useAuth } from "@/store/useAuth"
+import { useRole } from "@/store/useRole"
 
 export default function RootLayout({
   children,
@@ -32,24 +33,41 @@ export default function RootLayout({
 }>) {
   const router = useRouter()
   const { setProfile } = useProfile()
+  const setRole = useRole((state) => state.setRole)
   const { logout } = useAuth()
+  const [isLoading, setIsLoading] = useState(true)
+
+  const handleError = (error: any, message: string) => {
+    toast({
+      variant: "destructive",
+      title: "Error",
+      description: message + error.message,
+    })
+    router.push("/auth/login")
+  }
+
+  const getUserRole = async (user: any) => {
+    try {
+      const { data: userRole, error } = await supabase.from('user_roles_view').select("*").eq('user_id', user.id)
+      if (error) throw error
+      setRole(userRole)
+      return userRole
+    } catch (error) {
+      handleError(error, "Failed to fetch user role: ")
+    }
+  }
 
   const getUser = async () => {
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser()
-    if (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Error: " + error.message,
-      })
-      router.push("/auth/login")
-    }
-    if (user) {
+    setIsLoading(true)
+    try {
+      const { data: { user }, error } = await supabase.auth.getUser()
+      if (error) throw error
       setProfile(user)
-      router.push("/user")
+      await getUserRole(user)
+      setIsLoading(false)
+    } catch (error) {
+      handleError(error, "Failed to fetch user: ")
+      setIsLoading(false)
     }
   }
 
@@ -58,7 +76,7 @@ export default function RootLayout({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return (
+  return !isLoading && (
     <>
       <div className="grid h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
         <div className="hidden border-r bg-muted/40 md:block">

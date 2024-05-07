@@ -21,6 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { useRole } from "@/store/useRole"
 
 const SchedulePage = () => {
   const router = useRouter()
@@ -30,6 +31,7 @@ const SchedulePage = () => {
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(false)
   const [detail, setDetail] = useState<any>()
+  const { isAdmin } = useRole()
 
   const header = {
     left: "prev",
@@ -115,7 +117,9 @@ const SchedulePage = () => {
     <section className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-2xl font-semibold">Schedule</p>
-        <Button onClick={() => router.push("/schedule/create")}>Create</Button>
+        {isAdmin && (
+          <Button onClick={() => router.push("/schedule/create")}>Create</Button>
+        )}
       </div>
 
       {loading ? (

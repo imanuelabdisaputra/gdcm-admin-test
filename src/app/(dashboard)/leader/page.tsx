@@ -37,10 +37,10 @@ interface IUser {
   email: string;
 }
 
-const User = () => {
+const Leader = () => {
   const router = useRouter();
   const { toast } = useToast();
-  const [items, setItems] = useState<IUser[]>([]);
+  const [items, setItems] = useState<any[]>([]);
   const [rowSelection, setRowSelection] = useState({})
   const [isLoading, setIsLoading] = useState(true)
   const { isAdmin } = useRole()
@@ -97,7 +97,7 @@ const User = () => {
   });
 
   const fetchItems = async () => {
-    const { data: users, error } = await supabase.from("users").select();
+    const { data: users, error } = await supabase.from("leaders").select('id, users(id, name)');
     if (error) {
       toast({
         variant: "destructive",
@@ -128,12 +128,12 @@ const User = () => {
   useEffect(() => {
     fetchItems();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [toast]);
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between">
-        <h1 className="text-3xl font-semibold">Jemaat</h1>
+        <h1 className="text-3xl font-semibold">Leader</h1>
         {isAdmin && (
           <Button disabled={isLoading} onClick={() => router.push("/user/create")}>
             <Link href="/user/create">Tambah</Link>
@@ -186,4 +186,4 @@ const User = () => {
   );
 };
 
-export default User;
+export default Leader;

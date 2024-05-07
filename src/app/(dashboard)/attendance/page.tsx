@@ -29,6 +29,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DotsVerticalIcon } from "@radix-ui/react-icons";
+import { useRole } from "@/store/useRole";
 
 interface IItems {
   id: string;
@@ -42,6 +43,7 @@ const User = () => {
   const [items, setItems] = useState<IItems[]>([]);
   const [rowSelection, setRowSelection] = useState({});
   const [loading, setLoading] = useState(true);
+  const { isAdmin } = useRole()
 
   const columns: ColumnDef<any>[] = [
     {
@@ -146,9 +148,11 @@ const User = () => {
     <div className="space-y-4">
       <div className="flex justify-between">
         <h1 className="text-3xl font-semibold">Absensi</h1>
-        <Button onClick={() => router.push("/attendance/create")}>
-          Tambah
-        </Button>
+        {isAdmin && (
+          <Button onClick={() => router.push("/attendance/create")}>
+            Tambah
+          </Button>
+        )}
       </div>
 
       <Table>

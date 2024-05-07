@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { Home, Menu, Users, Calendar, Notebook } from "lucide-react"
+import { User, Menu, Users, Calendar, Notebook } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -18,7 +18,7 @@ interface IMenu {
 
 const menus: IMenu[] = [
   {
-    title: "User",
+    title: "Jemaat",
     to: "/user",
     icon: Users,
   },
@@ -31,6 +31,11 @@ const menus: IMenu[] = [
     title: "Schedule",
     to: "/schedule",
     icon: Calendar,
+  },
+  {
+    title: "Leader",
+    to: "/leader",
+    icon: User,
   },
 ]
 
