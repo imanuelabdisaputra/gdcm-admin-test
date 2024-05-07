@@ -8,17 +8,11 @@ interface IProfile {
   getUser: () => void
 }
 export const useProfile = create<IProfile>()((set) => ({
-  profile: JSON.parse(localStorage.getItem('profile') || '{}'),
+  profile: null,
   setProfile: (profile) => {
     set({ profile });
     localStorage.setItem('profile', JSON.stringify(profile));
   },
-  // role: JSON.parse(localStorage.getItem('role') || 'defaultRole'),
-  // setRole: (roles) => {
-  //     const role = roles[0]
-  //     set({ role });
-  //     localStorage.setItem('role', JSON.stringify(role));
-  // },
   getUser: async () => {
     const {
       data: { user },

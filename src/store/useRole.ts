@@ -10,8 +10,8 @@ interface IRole {
 }
 
 export const useRole = create<IRole>()((set) => ({
-  isAdmin: JSON.parse(localStorage.getItem("role") || "{}").isAdmin,
-  role: JSON.parse(localStorage.getItem("role") || "{}").role,
+  isAdmin: false,
+  role: null,
   setRole: (roles) => {
     const role = {
       role: roles[0],
