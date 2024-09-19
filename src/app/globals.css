@@ -96,7 +96,7 @@
 }
 
 .fc-timegrid-slot-label-frame.fc-scrollgrid-shrink-frame {
-  margin-top: -26px;
+  margin-top: -39px;
   background: #fff;
   text-align: left;
 }
@@ -110,6 +110,10 @@
 
 .fc .fc-timegrid-slot-minor {
   border-top-style: unset;
+}
+
+.fc .fc-timegrid-slot {
+  height: 50px;
 }
 
 .fc .fc-toolbar.fc-header-toolbar {

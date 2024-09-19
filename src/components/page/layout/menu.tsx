@@ -1,69 +1,91 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter, usePathname } from "next/navigation"
-import { User, Menu, Users, Calendar, Notebook } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
+import { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { User, Menu, Users, Calendar, Notebook } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import Logo from "@/assets/logo.png"
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import Logo from "@/assets/logo.png";
+import { AnimatePresence, motion } from "framer-motion";
+
+interface IProps {
+  isMobile?: boolean;
+  isSmall?: boolean;
+}
 
 interface IMenu {
-  title: string
-  to: string
-  icon: any
+  title: string;
+  to: string;
+  icon: any;
 }
 
 const menus: IMenu[] = [
   {
     title: "Jemaat",
     to: "/user",
-    icon: Users,
+    icon: Users
   },
   {
     title: "Attendance",
     to: "/attendance",
-    icon: Notebook,
+    icon: Notebook
   },
   {
     title: "Schedule",
     to: "/schedule",
-    icon: Calendar,
+    icon: Calendar
   },
   {
     title: "Leader",
     to: "/leader",
-    icon: User,
-  },
-]
+    icon: User
+  }
+];
 
-const MenuComponent = ({ isMobile }: { isMobile?: boolean }) => {
-  const [open, setOpen] = useState(false)
-  const router = useRouter()
-  const path = usePathname()
+const MenuComponent = ({ isMobile, isSmall }: IProps) => {
+  const [open, setOpen] = useState(false);
+  const router = useRouter();
+  const path = usePathname();
+  const [isActive, setIsActive] = useState(false);
 
   const onClickMenu = (val: IMenu) => {
-    router.push(val.to)
-    setOpen(false)
-  }
+    router.push(val.to);
+    setOpen(false);
+  };
 
   return isMobile ? (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet
+      open={open}
+      onOpenChange={setOpen}
+    >
       <SheetTrigger asChild>
-        <Button variant="outline" size="icon" className="shrink-0 md:hidden">
-          <Menu className="w-5 h-5" />
+        <Button
+          variant="outline"
+          size="icon"
+          className="shrink-0 md:hidden"
+        >
+          <Menu className="h-5 w-5" />
           <span className="sr-only">Toggle navigation menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="flex flex-col">
+      <SheetContent
+        side="left"
+        className="flex flex-col"
+      >
         <nav className="grid gap-2 text-lg font-medium">
           <Link
             href="#"
             className="flex items-center gap-2 text-lg font-semibold"
           >
-            <Image src={Logo} alt="" width={32} height={32} />
+            <Image
+              src={Logo}
+              alt=""
+              width={32}
+              height={32}
+            />
             <span>GDCM</span>
           </Link>
           {menus.map((item, i) => (
@@ -75,7 +97,7 @@ const MenuComponent = ({ isMobile }: { isMobile?: boolean }) => {
               }`}
               onClick={() => onClickMenu(item)}
             >
-              <item.icon className="w-5 h-5" />
+              <item.icon className="h-5 w-5" />
               {item.title}
             </Link>
           ))}
@@ -83,21 +105,36 @@ const MenuComponent = ({ isMobile }: { isMobile?: boolean }) => {
       </SheetContent>
     </Sheet>
   ) : (
-    <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+    <nav className="relative grid items-start space-y-1 px-2 text-sm font-medium lg:px-4">
       {menus.map((item, i) => (
-        <Link
-          key={i}
-          href={item.to}
-          className={`flex items-center gap-3 px-3 py-2 transition-all rounded-lg text-muted-foreground hover:text-primary ${
-            path.includes(item.to) ? `bg-muted !text-primary` : ""
-          }`}
-        >
-          <item.icon className="w-4 h-4" />
-          {item.title}
-        </Link>
+        <div key={i}>
+          <Link
+            href={item.to}
+            className={`relative flex h-11 items-center justify-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-gray-100 dark:hover:bg-gray-800 ${
+              path.includes(item.to) ? `` : ""
+            }`}
+          >
+            {path.includes(item.to) && (
+              <motion.span
+                layoutId="active-pill"
+                className={`absolute inset-0 h-11 rounded-lg bg-black dark:bg-slate-50`}
+                transition={{ type: "spring", duration: 0.6 }}
+              />
+            )}
+            <item.icon className="relative h-4 w-4 text-white mix-blend-exclusion" />
+            {!isSmall && (
+              <motion.span
+                layoutId="text"
+                className="relative flex-1 text-white mix-blend-exclusion"
+              >
+                {item.title}
+              </motion.span>
+            )}
+          </Link>
+        </div>
       ))}
     </nav>
-  )
-}
+  );
+};
 
-export default MenuComponent
+export default MenuComponent;

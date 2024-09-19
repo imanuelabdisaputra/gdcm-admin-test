@@ -1,100 +1,75 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
-import "../globals.css"
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import "../globals.css";
+import { motion } from "framer-motion";
 
-import { CircleUser } from "lucide-react"
+import { CircleUser } from "lucide-react";
 
-import { Toaster } from "@/components/ui/toaster"
-import MenuComponent from "@/components/page/layout/menu"
-import Logo from "@/assets/logo.png"
-import { Button } from "@/components/ui/button"
+import { Toaster } from "@/components/ui/toaster";
+import MenuComponent from "@/components/page/layout/menu";
+import Logo from "@/assets/logo.png";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import supabase from "@/config/supabaseClient"
-import { toast } from "@/components/ui/use-toast"
-import { useProfile } from "@/store/useProfile"
-import { useAuth } from "@/store/useAuth"
-import { useRole } from "@/store/useRole"
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/store/useAuth";
+import { ModeToggle } from "@/components/ui/mode-toggle";
 
 export default function RootLayout({
-  children,
+  children
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
-  const router = useRouter()
-  const { setProfile } = useProfile()
-  const setRole = useRole((state) => state.setRole)
-  const { logout } = useAuth()
-  const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter();
+  const { logout } = useAuth();
+  const [hide, setHide] = useState(true);
 
-  const handleError = (error: any, message: string) => {
-    toast({
-      variant: "destructive",
-      title: "Error",
-      description: message + error.message,
-    })
-    router.push("/auth/login")
-  }
-
-  const getUserRole = async (user: any) => {
-    try {
-      const { data: userRole, error } = await supabase.from('user_roles_view').select("*").eq('user_id', user.id)
-      if (error) throw error
-      setRole(userRole)
-      return userRole
-    } catch (error) {
-      handleError(error, "Failed to fetch user role: ")
-    }
-  }
-
-  const getUser = async () => {
-    setIsLoading(true)
-    try {
-      const { data: { user }, error } = await supabase.auth.getUser()
-      if (error) throw error
-      setProfile(user)
-      await getUserRole(user)
-      setIsLoading(false)
-    } catch (error) {
-      handleError(error, "Failed to fetch user: ")
-      setIsLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    getUser()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  return !isLoading && (
+  return (
     <>
-      <div className="grid h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-        <div className="hidden border-r bg-muted/40 md:block">
-          <div className="flex flex-col h-full max-h-screen gap-2">
-            <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-              <Link href="/" className="flex items-center gap-2 font-semibold">
-                <Image src={Logo} alt="" width={32} height={32} />
-                <span className="">GDCM</span>
-              </Link>
+      <div className="flex h-screen w-full pl-[84px]">
+        <motion.div
+          whileHover={{ width: "100%" }}
+          transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+          onHoverStart={() => setHide(false)}
+          onHoverEnd={() => setHide(true)}
+          className="absolute inset-0 z-10 hidden w-[84px] border-r bg-white dark:bg-black md:block md:max-w-56 xl:max-w-72"
+        >
+          <div className="relative flex h-full max-h-screen flex-col gap-2">
+            <div
+              className={`relative flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6`}
+            >
+              <div className="overflow-hidden">
+                <Link
+                  href="/"
+                  className="flex items-center gap-2 font-semibold"
+                >
+                  <Image
+                    src={Logo}
+                    alt="Logo GD"
+                    height={35}
+                    width={35}
+                  />
+                </Link>
+              </div>
             </div>
-            <div className="flex-1">
-              <MenuComponent />
+            <div className="flex-1 overflow-hidden">
+              <MenuComponent isSmall={hide} />
             </div>
           </div>
-        </div>
-        <div className="flex flex-col overflow-hidden">
-          <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 justify-between md:justify-end">
+        </motion.div>
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <header className="flex h-14 items-center justify-between gap-4 border-b bg-muted/40 px-4 md:justify-end lg:h-[60px] lg:px-6">
             <MenuComponent isMobile />
+            <ModeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -102,14 +77,16 @@ export default function RootLayout({
                   size="icon"
                   className="rounded-full"
                 >
-                  <CircleUser className="w-5 h-5" />
+                  <CircleUser className="h-5 w-5" />
                   <span className="sr-only">Toggle user menu</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => router.push('/profile')}>Profile</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/profile")}>
+                  Profile
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => logout(router)}>
                   Logout
@@ -117,12 +94,14 @@ export default function RootLayout({
               </DropdownMenuContent>
             </DropdownMenu>
           </header>
-          <main className="relative flex flex-col flex-1 gap-4 overflow-scroll lg:gap-6">
-            <section className="p-4 sm:container sm:py-6">{children}</section>
+          <main className="relative flex flex-1 flex-col gap-4 overflow-scroll lg:gap-6">
+            <section className="flex flex-1 flex-col p-4 sm:container sm:py-6">
+              {children}
+            </section>
           </main>
         </div>
       </div>
       <Toaster />
     </>
-  )
+  );
 }

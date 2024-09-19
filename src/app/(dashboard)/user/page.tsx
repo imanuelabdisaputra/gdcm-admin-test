@@ -5,7 +5,7 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
-  useReactTable,
+  useReactTable
 } from "@tanstack/react-table";
 import supabase from "@/config/supabaseClient";
 import { Button } from "@/components/ui/button";
@@ -19,14 +19,14 @@ import {
   TableHeader,
   TableRow,
   TableLoading,
-  TableEmpty,
+  TableEmpty
 } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { DotsVerticalIcon } from "@radix-ui/react-icons";
 import { useRole } from "@/store/useRole";
@@ -41,28 +41,29 @@ const User = () => {
   const router = useRouter();
   const { toast } = useToast();
   const [items, setItems] = useState<IUser[]>([]);
-  const [rowSelection, setRowSelection] = useState({})
-  const [isLoading, setIsLoading] = useState(true)
-  const { isAdmin } = useRole()
+  const [rowSelection, setRowSelection] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  const { isAdmin } = useRole();
 
   const columns: ColumnDef<any>[] = [
     {
       id: "no",
-      header: 'No',
-      cell: ({ row }) => (
-        <p>{row.index + 1}</p>
-      ),
+      header: "No",
+      cell: ({ row }) => <p>{row.index + 1}</p>,
       enableSorting: false,
-      enableHiding: false,
+      enableHiding: false
     },
     {
       accessorKey: "name",
       header: "Nama",
       cell: ({ row }) => (
-        <div className="capitalize" onClick={() => router.push(`/user/${row.original.id}`)}>
+        <div
+          className="capitalize"
+          onClick={() => router.push(`/user/${row.original.id}`)}
+        >
           {row.getValue("name")}
         </div>
-      ),
+      )
     },
     {
       id: "actions",
@@ -71,7 +72,10 @@ const User = () => {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
+              <Button
+                variant="outline"
+                size="icon"
+              >
                 <DotsVerticalIcon className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -82,8 +86,8 @@ const User = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         );
-      },
-    },
+      }
+    }
   ];
 
   const table = useReactTable({
@@ -92,33 +96,36 @@ const User = () => {
     getCoreRowModel: getCoreRowModel(),
     onRowSelectionChange: setRowSelection,
     state: {
-      rowSelection,
-    },
+      rowSelection
+    }
   });
 
   const fetchItems = async () => {
-    const { data: users, error } = await supabase.from("users").select();
-    if (error) {
+    try {
+      const { data: users, error } = await supabase.from("users").select();
+      if (error) throw error;
+      if (users) {
+        setItems(users);
+      }
+      setIsLoading(false);
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Error fetching users: " + error.message,
+        description: "Error fetching users: " + error.message
       });
+      setIsLoading(false);
     }
-    if (users) {
-      setItems(users)
-    };
-    setIsLoading(false)
   };
 
   const onDelete = async (id: string) => {
-    setIsLoading(true)
+    setIsLoading(true);
     const { error } = await supabase.from("users").delete().eq("id", id);
     if (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Error deleting user: " + error.message,
+        description: "Error deleting user: " + error.message
       });
     } else {
       await fetchItems();
@@ -135,7 +142,10 @@ const User = () => {
       <div className="flex justify-between">
         <h1 className="text-3xl font-semibold">Jemaat</h1>
         {isAdmin && (
-          <Button disabled={isLoading} onClick={() => router.push("/user/create")}>
+          <Button
+            disabled={isLoading}
+            onClick={() => router.push("/user/create")}
+          >
             <Link href="/user/create">Tambah</Link>
           </Button>
         )}
@@ -166,7 +176,7 @@ const User = () => {
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
-                data-state={row.getIsSelected() && "selected"}
+                // data-state={row.getIsSelected() && "selected"}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
