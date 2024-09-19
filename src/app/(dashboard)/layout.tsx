@@ -69,7 +69,9 @@ export default function RootLayout({
         <div className="flex flex-1 flex-col overflow-hidden">
           <header className="flex h-14 items-center justify-between gap-4 border-b bg-muted/40 px-4 md:justify-end lg:h-[60px] lg:px-6">
             <MenuComponent isMobile />
+
             <ModeToggle />
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
