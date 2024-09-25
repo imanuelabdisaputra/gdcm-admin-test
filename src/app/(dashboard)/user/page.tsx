@@ -41,15 +41,17 @@ const User = () => {
   const router = useRouter();
   const { toast } = useToast();
   const [items, setItems] = useState<IUser[]>([]);
-  const [rowSelection, setRowSelection] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const { isAdmin } = useRole();
+
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10); // You can adjust the limit as needed
 
   const columns: ColumnDef<any>[] = [
     {
       id: "no",
       header: "No",
-      cell: ({ row }) => <p>{row.index + 1}</p>,
+      cell: ({ row }) => <p>{(page - 1) * limit + row.index + 1}</p>,
       enableSorting: false,
       enableHiding: false
     },
@@ -76,7 +78,7 @@ const User = () => {
                 variant="outline"
                 size="icon"
               >
-                <DotsVerticalIcon className="w-4 h-4" />
+                <DotsVerticalIcon className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -93,16 +95,16 @@ const User = () => {
   const table = useReactTable({
     data: items,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    onRowSelectionChange: setRowSelection,
-    state: {
-      rowSelection
-    }
+    getCoreRowModel: getCoreRowModel()
   });
 
-  const fetchItems = async () => {
+  const fetchItems = async (page: number, limit: number) => {
+    setIsLoading(true);
     try {
-      const { data: users, error } = await supabase.from("users").select();
+      const { data: users, error } = await supabase
+        .from("users")
+        .select()
+        .range((page - 1) * limit, page * limit - 1);
       if (error) throw error;
       if (users) {
         setItems(users);
@@ -128,14 +130,14 @@ const User = () => {
         description: "Error deleting user: " + error.message
       });
     } else {
-      await fetchItems();
+      await fetchItems(page, limit);
     }
   };
 
   useEffect(() => {
-    fetchItems();
+    fetchItems(page, limit);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [page]);
 
   return (
     <div className="space-y-4">
@@ -151,47 +153,70 @@ const User = () => {
         )}
       </div>
 
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                // data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+      <div>
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
-            ))
-          ) : isLoading ? (
-            <TableLoading colSpan={columns.length} />
-          ) : (
-            <TableEmpty colSpan={columns.length} />
-          )}
-        </TableBody>
-      </Table>
+            ))}
+          </TableHeader>
+
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  // data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : isLoading ? (
+              <TableLoading colSpan={columns.length} />
+            ) : (
+              <TableEmpty colSpan={columns.length} />
+            )}
+          </TableBody>
+        </Table>
+        <div className="flex items-center justify-end space-x-2 py-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+            disabled={page === 1}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage((prev) => prev + 1)}
+            disabled={items.length < limit}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
